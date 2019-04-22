@@ -1,26 +1,30 @@
 import os
+import sysconfig
+import urllib.request
+import zipfile
+import shutil
 
 from distutils.core import setup
 
-def find_packages(srcdir):
-    package_list = []
-    badnames=["__pycache__",]
-    for root, dirs, files in os.walk(srcdir):
-        if not any(bad in root for bad in badnames):
-            if "__init__.py" in files:
-                package_list.append( root.replace("/",".").replace("\\",".").strip('.') )
-    return package_list
-
 if os.name == 'nt':
 	# We're on Windows
-	cdaf_packages = find_packages('automation_windows/')
+    url = 'https://github.com/cdaf/windows/archive/master.zip'
 else:
 	# We're on Linux
-	cdaf_packages = find_packages('automation_linux/')
-	
-	
+	url = 'https://github.com/cdaf/linux/archive/master.zip'
 
-setup(name='cdaf',
+prefix = 'windows-master/'
+response, header = urllib.request.urlretrieve(url)
+with zipfile.ZipFile(response) as zip:
+    for file in zip.namelist():
+        if file.startswith(prefix + 'automation' ):
+            if not file.endswith('/'):
+                zip.extract(file,'build')
+scripts = sysconfig.get_path('scripts')
+shutil.rmtree(scripts+'/automation', ignore_errors=True)
+shutil.move('build/'+prefix+'automation', scripts+'/automation')
+
+setup(name='pycdaf',
     version='0.1-alpha',
-    packages=cdaf_packages
+    packages=[]
 )
