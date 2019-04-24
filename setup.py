@@ -9,11 +9,11 @@ from distutils.core import setup
 if os.name == 'nt':
 	# We're on Windows
     url = 'https://github.com/cdaf/windows/archive/master.zip'
-    emulate_script  'cdEmulate.bat'
+    emulate_script = 'cdEmulate.bat'
 else:
 	# We're on Linux
     url = 'https://github.com/cdaf/linux/archive/master.zip'
-    emulate_script  'cdEmulate.sh'
+    emulate_script = 'cdEmulate.sh'
 
 prefix = 'windows-master/'
 response, header = urllib.request.urlretrieve(url)
