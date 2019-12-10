@@ -1,9 +1,9 @@
-import os
+import os, ssl
 import sysconfig
 import urllib.request
 import zipfile
 import shutil
-
+    
 from distutils.core import setup
 
 if os.name == 'nt':
@@ -15,8 +15,13 @@ else:
     url = 'https://github.com/cdaf/linux/archive/master.zip'
     emulate_script = 'cdEmulate.sh'
 
-prefix = 'windows-master/'
+# Fix for Windows server 2016 core issue. TBD: Change to Requests library
+if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
+    ssl._create_default_https_context = ssl._create_unverified_context
+    
 response, header = urllib.request.urlretrieve(url)
+
+prefix = 'windows-master/'
 with zipfile.ZipFile(response) as zip:
     for file in zip.namelist():
         if file.startswith(prefix + 'automation' ):
